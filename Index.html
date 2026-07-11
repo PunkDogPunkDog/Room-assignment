@@ -325,14 +325,14 @@ function defaultConfig(){
 
 async function loadAll(){
   try{
-    const c = await window.storage.get(STORAGE_KEY, false);
-    config = c ? JSON.parse(c.value) : defaultConfig();
+    const c = localStorage.getItem(STORAGE_KEY);
+    config = c ? JSON.parse(c) : defaultConfig();
   }catch(e){
     config = defaultConfig();
   }
   try{
-    const w = await window.storage.get(WORKING_KEY, false);
-    working = w ? JSON.parse(w.value) : [];
+    const w = localStorage.getItem(WORKING_KEY);
+    working = w ? JSON.parse(w) : [];
   }catch(e){
     working = [];
   }
@@ -341,7 +341,7 @@ async function loadAll(){
 
 async function saveConfig(){
   try{
-    await window.storage.set(STORAGE_KEY, JSON.stringify(config), false);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
   }catch(e){
     console.error('Could not save setup', e);
   }
@@ -349,7 +349,7 @@ async function saveConfig(){
 
 async function saveWorking(){
   try{
-    await window.storage.set(WORKING_KEY, JSON.stringify(working), false);
+    localStorage.setItem(WORKING_KEY, JSON.stringify(working));
   }catch(e){
     console.error('Could not save today\'s roster', e);
   }
