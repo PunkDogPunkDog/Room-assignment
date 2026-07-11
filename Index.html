@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDEFE9;
+    --panel:#FBFAF6;
+    --ink:#22282B;
+    --ink-soft:#5B615F;
+    --line:#D8D4C8;
+    --teal:#35635C;
+    --amber:#C99A3B;
+    --plum:#6B4C9A;
+    --slate:#3E6FA6;
+    --olive:#8A8F76;
+    --danger:#A3432F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    padding-bottom:80px;
+  }
+  header{
+    padding:28px 20px 20px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  header h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.6rem;
+    margin:0 0 2px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:0.85rem;
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px;
+    margin-top:20px;
+  }
+  @media(min-width:860px){
+    .grid{grid-template-columns:1fr 1fr;}
+    .grid.full{grid-template-columns:1fr;}
+  }
+  section.panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 20px;
+  }
+  section.panel h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1rem;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 14px;
+  }
+  .room-row{
+    display:grid;
+    grid-template-columns:28px 1fr 90px;
+    gap:8px;
+    align-items:center;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .room-row:last-child{border-bottom:none;}
+  .room-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  input[type=text], input[type=number]{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.85rem;
+    padding:6px 8px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+    width:100%;
+  }
+  input[type=number]{
+    font-family:'IBM Plex Mono', monospace;
+    text-align:right;
+  }
+  .person-block{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+    margin-bottom:12px;
+    background:#fff;
+  }
+  .person-block:last-child{margin-bottom:0;}
+  .person-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .swatch{
+    width:12px;height:12px;border-radius:3px;flex:none;
+  }
+  .person-head input[type=text]{
+    font-weight:600;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.92rem;
+  }
+  .default-note{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+  }
+  .default-note.warn{color:var(--danger);}
+  .room-checks{
+    display:grid;
+    grid-template-columns:repeat(6, 1fr);
+    gap:6px;
+  }
+  .room-check{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    background:var(--paper);
+    border-radius:5px;
+    padding:4px 5px;
+  }
+  .room-check input{margin:0;}
+  .floater-note{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .working-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .working-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:7px 12px 7px 8px;
+    background:#fff;
+    font-size:0.85rem;
+    cursor:pointer;
+    user-select:none;
+  }
+  .working-chip input{margin:0;}
+  .working-chip.active{
+    border-color:var(--teal);
+    background:#EAF1EF;
+  }
+  button.generate{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:12px 20px;
+    cursor:pointer;
+    width:100%;
+    margin-top:14px;
+    letter-spacing:0.01em;
+  }
+  button.generate:hover{background:#2A514C;}
+  button.generate:disabled{background:var(--ink-soft);cursor:not-allowed;}
+  .msg{
+    font-size:0.82rem;
+    padding:10px 12px;
+    border-radius:6px;
+    margin-top:10px;
+  }
+  .msg.error{background:#F5E2DC;color:var(--danger);}
+  .msg.info{background:#EAF1EF;color:var(--teal);}
+  .results{margin-top:20px;}
+  .board{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:8px;
+    margin-bottom:18px;
+  }
+  @media(max-width:600px){
+    .board{grid-template-columns:repeat(3, 1fr);}
+    .room-checks{grid-template-columns:repeat(4,1fr);}
+  }
+  .tile{
+    border-radius:8px;
+    padding:10px 8px;
+    color:#fff;
+    min-height:70px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .tile .tnum{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    opacity:0.85;
+  }
+  .tile .tname{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.82rem;
+    line-height:1.15;
+    margin:4px 0;
+  }
+  .tile .tcount{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    opacity:0.9;
+  }
+  .tally{
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .tally-row{
+    display:grid;
+    grid-template-columns:130px 1fr 70px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+  }
+  .tally-name{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:0.82rem;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .bar-track{
+    background:var(--line);
+    border-radius:4px;
+    height:10px;
+    overflow:hidden;
+  }
+  .bar-fill{height:100%;border-radius:4px;}
+  .spread-note{
+    margin-top:12px;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  .reset-link{
+    display:block;
+    text-align:center;
+    margin-top:26px;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .loading{padding:40px;text-align:center;color:var(--ink-soft);font-size:0.85rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Room Board</h1>
+    <p>Set your rooms and default assignments once — then split the day's rooms fairly, every day.</p>
+  </div>
+</header>
+
+<div class="wrap" id="app">
+  <div class="loading">Loading your setup…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'wnprc-roster-config';
+const WORKING_KEY = 'wnprc-today-working';
+const COLORS = ['#35635C', '#C99A3B', '#6B4C9A', '#3E6FA6', '#8A8F76'];
+
+let config = null;
+let working = [];
+let lastResult = null;
+
+function defaultConfig(){
+  const rooms = [];
+  for(let i=1;i<=12;i++){
+    rooms.push({id:'r'+i, name:'Room '+i, animals:0});
+  }
+  const people = [];
+  for(let i=1;i<=4;i++){
+    people.push({id:'p'+i, name:'Staff '+i, defaultRoomIds:[]});
+  }
+  people.push({id:'p5', name:'Me (floater)', defaultRoomIds:[]});
+  return {rooms, people};
+}
+
+async function loadAll(){
+  try{
+    const c = await window.storage.get(STORAGE_KEY, false);
+    config = c ? JSON.parse(c.value) : defaultConfig();
+  }catch(e){
+    config = defaultConfig();
+  }
+  try{
+    const w = await window.storage.get(WORKING_KEY, false);
+    working = w ? JSON.parse(w.value) : [];
+  }catch(e){
+    working = [];
+  }
+  render();
+}
+
+async function saveConfig(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(config), false);
+  }catch(e){
+    console.error('Could not save setup', e);
+  }
+}
+
+async function saveWorking(){
+  try{
+    await window.storage.set(WORKING_KEY, JSON.stringify(working), false);
+  }catch(e){
+    console.error('Could not save today\'s roster', e);
+  }
+}
+
+function roomName(id){
+  const r = config.rooms.find(r=>r.id===id);
+  return r ? r.name : id;
+}
+
+function personColor(idx){ return COLORS[idx % COLORS.length]; }
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="grid">
+      <section class="panel" id="rooms-panel"></section>
+      <section class="panel" id="people-panel"></section>
+    </div>
+    <div class="grid full">
+      <section class="panel" id="today-panel"></section>
+    </div>
+    <div id="results-panel"></div>
+    <div class="reset-link" id="reset-link">Reset all saved setup</div>
+  `;
+  renderRooms();
+  renderPeople();
+  renderToday();
+  document.getElementById('reset-link').onclick = async () => {
+    if(confirm('Clear all saved rooms, defaults, and today\'s roster? This cannot be undone.')){
+      config = defaultConfig();
+      working = [];
+      await saveConfig();
+      await saveWorking();
+      render();
+    }
+  };
+}
+
+function renderRooms(){
+  const panel = document.getElementById('rooms-panel');
+  panel.innerHTML = `
+    <h2>Rooms</h2>
+    <p class="eyebrow">Animal count per room · sticks until you change it</p>
+    <div id="room-rows"></div>
+  `;
+  const rows = document.getElementById('room-rows');
+  config.rooms.forEach((room, idx) => {
+    const row = document.createElement('div');
+    row.className = 'room-row';
+    row.innerHTML = `
+      <div class="room-num">${idx+1}</div>
+      <input type="text" value="${escapeAttr(room.name)}" data-room="${room.id}" data-field="name">
+      <input type="number" min="0" value="${room.animals}" data-room="${room.id}" data-field="animals">
+    `;
+    rows.appendChild(row);
+  });
+  rows.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const id = e.target.dataset.room;
+      const field = e.target.dataset.field;
+      const room = config.rooms.find(r=>r.id===id);
+      if(field === 'name'){
+        room.name = e.target.value.trim() || room.name;
+      } else {
+        room.animals = Math.max(0, parseInt(e.target.value) || 0);
+      }
+      saveConfig();
+      // room names may have changed - refresh people panel labels
+      renderPeople();
+    });
+  });
+}
+
+function renderPeople(){
+  const panel = document.getElementById('people-panel');
+  panel.innerHTML = `
+    <h2>Team &amp; default rooms</h2>
+    <p class="eyebrow">Each person's default rooms stick until you change them</p>
+    <div id="people-blocks"></div>
+  `;
+  const blocks = document.getElementById('people-blocks');
+  config.people.forEach((person, idx) => {
+    const isFloater = idx === 4;
+    const block = document.createElement('div');
+    block.className = 'person-block';
+    const count = person.defaultRoomIds.length;
+    let noteHtml = '';
+    if(isFloater){
+      noteHtml = `<p class="floater-note">Floater — no default rooms. Picks up whatever's left over.</p>`;
+    } else {
+      const warn = count !== 3 ? ' warn' : '';
+      noteHtml = `<p class="default-note${warn}">${count} default room${count===1?'':'s'} selected${count!==3?' (usually 3)':''}</p>`;
+    }
+    let checksHtml = '';
+    if(!isFloater){
+      checksHtml = `<div class="room-checks">` + config.rooms.map(r => `
+        <label class="room-check">
+          <input type="checkbox" data-person="${person.id}" data-room="${r.id}" ${person.defaultRoomIds.includes(r.id)?'checked':''}>
+          ${escapeHtml(r.name)}
+        </label>
+      `).join('') + `</div>`;
+    }
+    block.innerHTML = `
+      <div class="person-head">
+        <span class="swatch" style="background:${personColor(idx)}"></span>
+        <input type="text" value="${escapeAttr(person.name)}" data-person-name="${person.id}">
+      </div>
+      ${noteHtml}
+      ${checksHtml}
+    `;
+    blocks.appendChild(block);
+  });
+  blocks.querySelectorAll('input[data-person-name]').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const person = config.people.find(p=>p.id===e.target.dataset.personName);
+      person.name = e.target.value.trim() || person.name;
+      saveConfig();
+      renderToday();
+    });
+  });
+  blocks.querySelectorAll('input[data-room][data-person]').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const person = config.people.find(p=>p.id===e.target.dataset.person);
+      const roomId = e.target.dataset.room;
+      if(e.target.checked){
+        if(!person.defaultRoomIds.includes(roomId)) person.defaultRoomIds.push(roomId);
+      } else {
+        person.defaultRoomIds = person.defaultRoomIds.filter(id=>id!==roomId);
+      }
+      saveConfig();
+      renderPeople();
+    });
+  });
+}
+
+function renderToday(){
+  const panel = document.getElementById('today-panel');
+  panel.innerHTML = `
+    <h2>Who's working today</h2>
+    <p class="eyebrow">Check everyone on shift, then generate the split</p>
+    <div class="working-list" id="working-list"></div>
+    <button class="generate" id="gen-btn">Generate room assignments</button>
+    <div id="gen-msg"></div>
+  `;
+  const list = document.getElementById('working-list');
+  config.people.forEach((person, idx) => {
+    const chip = document.createElement('label');
+    const active = working.includes(person.id);
+    chip.className = 'working-chip' + (active ? ' active' : '');
+    chip.innerHTML = `<input type="checkbox" data-working="${person.id}" ${active?'checked':''}><span>${escapeHtml(person.name)}</span>`;
+    list.appendChild(chip);
+  });
+  list.querySelectorAll('input[data-working]').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const id = e.target.dataset.working;
+      if(e.target.checked){
+        if(!working.includes(id)) working.push(id);
+      } else {
+        working = working.filter(w=>w!==id);
+      }
+      saveWorking();
+      renderToday();
+    });
+  });
+  document.getElementById('gen-btn').onclick = generate;
+}
+
+function generate(){
+  const msgEl = document.getElementById('gen-msg');
+  msgEl.innerHTML = '';
+  const workingPeople = config.people.filter(p => working.includes(p.id));
+  if(workingPeople.length === 0){
+    msgEl.innerHTML = `<div class="msg error">Check off at least one person before generating.</div>`;
+    return;
+  }
+
+  const load = {}; // personId -> {animals, rooms:[]}
+  workingPeople.forEach(p => load[p.id] = {animals:0, rooms:[]});
+  const assigned = {}; // roomId -> personId
+
+  // Step 1: lock in default rooms for working owners
+  workingPeople.forEach(p => {
+    p.defaultRoomIds.forEach(roomId => {
+      const room = config.rooms.find(r=>r.id===roomId);
+      if(room && !assigned[roomId]){
+        assigned[roomId] = p.id;
+        load[p.id].animals += room.animals;
+        load[p.id].rooms.push(roomId);
+      }
+    });
+  });
+
+  // Step 2: pool the leftover rooms (unowned today), sorted high-to-low by animal count
+  const leftover = config.rooms.filter(r => !assigned[r.id]).sort((a,b)=>b.animals-a.animals);
+
+  // Step 3: greedy-assign each to whoever currently has the lightest load
+  leftover.forEach(room => {
+    let best = workingPeople[0];
+    workingPeople.forEach(p => {
+      if(load[p.id].animals < load[best.id].animals) best = p;
+    });
+    assigned[room.id] = best.id;
+    load[best.id].animals += room.animals;
+    load[best.id].rooms.push(room.id);
+  });
+
+  lastResult = {assigned, load, workingPeople};
+  if(workingPeople.length < 2 || workingPeople.length > 5){
+    msgEl.innerHTML = `<div class="msg info">Heads up — you've got ${workingPeople.length} people on today, outside your usual 2–5 range. Assignments below are generated anyway.</div>`;
+  }
+  renderResults();
+}
+
+function renderResults(){
+  if(!lastResult) return;
+  const {assigned, load, workingPeople} = lastResult;
+  const panel = document.getElementById('results-panel');
+
+  const colorFor = (personId) => {
+    const idx = config.people.findIndex(p=>p.id===personId);
+    return personColor(idx);
+  };
+  const nameFor = (personId) => config.people.find(p=>p.id===personId).name;
+
+  const boardHtml = config.rooms.map((room, i) => {
+    const pid = assigned[room.id];
+    const color = pid ? colorFor(pid) : '#B9B6A8';
+    const pname = pid ? nameFor(pid) : 'Unassigned';
+    return `
+      <div class="tile" style="background:${color}">
+        <span class="tnum">${i+1}</span>
+        <span class="tname">${escapeHtml(pname)}</span>
+        <span class="tcount">${escapeHtml(room.name)} · ${room.animals}</span>
+      </div>
+    `;
+  }).join('');
+
+  const totals = workingPeople.map(p => load[p.id].animals);
+  const maxTotal = Math.max(1, ...totals);
+  const spread = Math.max(...totals) - Math.min(...totals);
+
+  const tallyHtml = workingPeople.map(p => {
+    const l = load[p.id];
+    const pct = Math.round((l.animals / maxTotal) * 100);
+    const idx = config.people.findIndex(pp=>pp.id===p.id);
+    return `
+      <div class="tally-row">
+        <span class="tally-name"><span class="swatch" style="background:${personColor(idx)}"></span>${escapeHtml(p.name)}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${pct}%;background:${personColor(idx)}"></span></span>
+        <span>${l.animals} · ${l.rooms.length}rm</span>
+      </div>
+    `;
+  }).join('');
+
+  panel.innerHTML = `
+    <section class="panel results">
+      <h2>Today's split</h2>
+      <p class="eyebrow">Room board — color = assigned person</p>
+      <div class="board">${boardHtml}</div>
+      <div class="tally">
+        <p class="eyebrow" style="margin-bottom:10px;">Animal load per person</p>
+        ${tallyHtml}
+        <p class="spread-note">Spread between busiest and lightest load: ${spread} animal${spread===1?'':'s'}.</p>
+      </div>
+    </section>
+  `;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+loadAll();
+</script>
+
+</body>
+</html>
