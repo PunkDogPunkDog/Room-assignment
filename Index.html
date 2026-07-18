@@ -286,6 +286,19 @@
     cursor:pointer;
   }
   .loading{padding:40px;text-align:center;color:var(--ink-soft);font-size:0.85rem;}
+  textarea.notes{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.85rem;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+    width:100%;
+    min-height:90px;
+    resize:vertical;
+    margin-top:14px;
+  }
 </style>
 </head>
 <body>
@@ -304,10 +317,12 @@
 <script>
 const STORAGE_KEY = 'wnprc-roster-config';
 const WORKING_KEY = 'wnprc-today-working';
+const NOTES_KEY = 'wnprc-notes';
 const COLORS = ['#35635C', '#C99A3B', '#6B4C9A', '#3E6FA6', '#8A8F76'];
 
 let config = null;
 let working = [];
+let notes = '';
 let lastResult = null;
 
 function defaultConfig(){
@@ -336,6 +351,11 @@ async function loadAll(){
   }catch(e){
     working = [];
   }
+  try{
+    notes = localStorage.getItem(NOTES_KEY) || '';
+  }catch(e){
+    notes = '';
+  }
   render();
 }
 
@@ -352,6 +372,14 @@ async function saveWorking(){
     localStorage.setItem(WORKING_KEY, JSON.stringify(working));
   }catch(e){
     console.error('Could not save today\'s roster', e);
+  }
+}
+
+async function saveNotes(){
+  try{
+    localStorage.setItem(NOTES_KEY, notes);
+  }catch(e){
+    console.error('Could not save notes', e);
   }
 }
 
@@ -494,6 +522,7 @@ function renderToday(){
     <div class="working-list" id="working-list"></div>
     <button class="generate" id="gen-btn">Generate room assignments</button>
     <div id="gen-msg"></div>
+    <textarea class="notes" id="notes-field" placeholder="Notes — big jobs, coverage swaps, anything worth flagging…">${escapeHtml(notes)}</textarea>
   `;
   const list = document.getElementById('working-list');
   config.people.forEach((person, idx) => {
@@ -516,6 +545,10 @@ function renderToday(){
     });
   });
   document.getElementById('gen-btn').onclick = generate;
+  document.getElementById('notes-field').addEventListener('change', (e) => {
+    notes = e.target.value;
+    saveNotes();
+  });
 }
 
 function generate(){
